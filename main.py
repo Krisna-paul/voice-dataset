@@ -21,7 +21,10 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_DIR = os.environ.get("DATASET_DIR", os.path.join(BASE_DIR, "dataset"))
 AUDIO_DIR   = os.path.join(DATASET_DIR, "audio")
 
-os.makedirs(AUDIO_DIR, exist_ok=True)
+try:
+    os.makedirs(AUDIO_DIR, exist_ok=True)
+except PermissionError:
+    logger.warning(f"Could not create {AUDIO_DIR}")
 
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
