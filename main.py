@@ -5,7 +5,7 @@ import base64
 import asyncio
 import logging
 from fastapi import FastAPI, Request, Form, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -135,7 +135,7 @@ async def debug():
         "audio_dir": AUDIO_DIR,
         "dataset_dir_contents": os.listdir(DATASET_DIR) if os.path.exists(DATASET_DIR) else "NOT FOUND"
     }
-from fastapi.responses import FileResponse
+
 
 @app.get("/download-csv")
 async def download_csv():
