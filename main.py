@@ -17,7 +17,9 @@ app = FastAPI(title="Voice Dataset Collector")
 os.makedirs("dataset/audio", exist_ok=True)
 os.makedirs("templates", exist_ok=True)
 
-templates = Jinja2Templates(directory="templates")
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 CSV_FILE = "dataset/metadata.csv"
 MAX_AUDIO_SIZE_MB = 10
