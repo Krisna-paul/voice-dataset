@@ -9,6 +9,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from datetime import datetime
 import csv
 import io
+import zipfile
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -138,6 +139,39 @@ async def download_audio(filename: str):
         io.BytesIO(audio_bytes),
         media_type="audio/webm",
         headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+@app.get("/download-all")
+async def download_all():
+    entries = await collection.find({}).to_list(length=10000)
+    if not entries:
+        raise HTTPException(status_code=404, detail="No data yet.")
+
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+        # Add CSV
+        csv_output = io.StringIO()
+        writer = csv.writer(csv_output)
+        writer.writerow(["filename", "text", "language", "environment", "timestamp"])
+        for e in entries:
+            writer.writerow([
+                e.get("filename", ""),
+                e.get("text", ""),
+                e.get("language", ""),
+                e.get("environment", ""),
+                e.get("timestamp", ""),
+            ])
+            # Add audio file
+            if "audio_b64" in e:
+                audio_bytes = base64.b64decode(e["audio_b64"])
+                zf.writestr(f"audio/{e['filename']}", audio_bytes)
+
+        zf.writestr("metadata.csv", csv_output.getvalue())
+
+    zip_buffer.seek(0)
+    return StreamingResponse(
+        zip_buffer,
+        media_type="application/zip",
+        headers={"Content-Disposition": "attachment; filename=dataset.zip"}
     )
 
 
