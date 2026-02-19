@@ -135,3 +135,10 @@ async def debug():
         "audio_dir": AUDIO_DIR,
         "dataset_dir_contents": os.listdir(DATASET_DIR) if os.path.exists(DATASET_DIR) else "NOT FOUND"
     }
+from fastapi.responses import FileResponse
+
+@app.get("/download-csv")
+async def download_csv():
+    if not os.path.exists(CSV_FILE):
+        raise HTTPException(status_code=404, detail="No data yet")
+    return FileResponse(CSV_FILE, filename="metadata.csv")
