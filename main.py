@@ -23,8 +23,14 @@ AUDIO_DIR   = os.path.join(DATASET_DIR, "audio")
 
 try:
     os.makedirs(AUDIO_DIR, exist_ok=True)
-except PermissionError:
-    logger.warning(f"Could not create {AUDIO_DIR}")
+except (PermissionError, OSError) as e:
+    logger.warning(f"Could not create {AUDIO_DIR}: {e}")
+
+# Also make sure CSV file parent directory exists
+try:
+    os.makedirs(DATASET_DIR, exist_ok=True)
+except (PermissionError, OSError) as e:
+    logger.warning(f"Could not create {DATASET_DIR}: {e}")
 
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
