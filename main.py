@@ -14,17 +14,21 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Voice Dataset Collector")
 
-os.makedirs("dataset/audio", exist_ok=True)
-os.makedirs("templates", exist_ok=True)
-
-import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# On Render, the persistent disk is mounted at /app/dataset
+# Locally, it falls back to a dataset/ folder next to main.py
+DATASET_DIR = os.environ.get("DATASET_DIR", os.path.join(BASE_DIR, "dataset"))
+AUDIO_DIR   = os.path.join(DATASET_DIR, "audio")
+
+os.makedirs(AUDIO_DIR, exist_ok=True)
+
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
-CSV_FILE = "dataset/metadata.csv"
-MAX_AUDIO_SIZE_MB = 10
-VALID_LANGUAGES = {"bengali", "english", "mixed"}
-VALID_NOISE = {"noisy", "quiet"}
+CSV_FILE           = os.path.join(DATASET_DIR, "metadata.csv")
+MAX_AUDIO_SIZE_MB  = 10
+VALID_LANGUAGES    = {"bengali", "english", "mixed"}
+VALID_NOISE        = {"noisy", "quiet"}
 
 csv_lock = asyncio.Lock()
 
@@ -50,7 +54,7 @@ async def stats():
         for row in reader:
             counts["total"] += 1
             lang = row.get("language", "").lower()
-            env = row.get("environment", "").lower()
+            env  = row.get("environment", "").lower()
             if lang in counts:
                 counts[lang] += 1
             if env in counts:
@@ -60,9 +64,9 @@ async def stats():
 
 @app.post("/upload/")
 async def upload(
-    audio_data: str = Form(...),
-    text: str = Form(...),
-    language: str = Form(...),
+    audio_data:  str = Form(...),
+    text:        str = Form(...),
+    language:    str = Form(...),
     environment: str = Form(...),
 ):
     from datetime import datetime
@@ -97,8 +101,8 @@ async def upload(
         raise HTTPException(status_code=400, detail=f"Audio exceeds {MAX_AUDIO_SIZE_MB}MB limit.")
 
     # Save audio
-    filename = f"{uuid.uuid4()}.webm"
-    file_path = f"dataset/audio/{filename}"
+    filename  = f"{uuid.uuid4()}.webm"
+    file_path = os.path.join(AUDIO_DIR, filename)
 
     try:
         with open(file_path, "wb") as f:
