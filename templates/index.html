@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VoiceForge — Dataset Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --border: #1e1e2e;
+      --accent: #7c3aed;
+      --accent2: #06b6d4;
+      --accent3: #f59e0b;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --success: #10b981;
+      --error: #ef4444;
+      --glow: rgba(124, 58, 237, 0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(124,58,237,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 110%, rgba(6,182,212,0.08) 0%, transparent 60%);
+    }
+
+    .noise {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    .container {
+      position: relative; z-index: 1;
+      max-width: 660px; margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* ── Header ── */
+    header {
+      margin-bottom: 48px;
+      display: flex; align-items: flex-start; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .brand { display: flex; flex-direction: column; gap: 4px; }
+    .brand-title {
+      font-size: 2rem; font-weight: 800; letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #a78bfa 0%, #06b6d4 100%);
+      background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .brand-sub { font-size: 0.78rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    /* Stats pill */
+    .stats-bar {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .stat-pill {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+      padding: 5px 12px; border-radius: 100px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted); display: flex; align-items: center; gap: 6px;
+    }
+    .stat-pill span { color: var(--text); font-weight: 500; }
+
+    /* ── Step cards ── */
+    .steps { display: flex; flex-direction: column; gap: 16px; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: border-color 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(124,58,237,0.04), transparent 60%);
+      pointer-events: none;
+    }
+    .card.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 8px 32px var(--glow); }
+
+    .card-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+    }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), #5b21b6);
+      display: grid; place-items: center;
+      font-size: 0.72rem; font-weight: 700; color: white; flex-shrink: 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .step-num.done { background: linear-gradient(135deg, var(--success), #059669); }
+    .card-title { font-size: 0.9rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+
+    /* ── Section 1: Recording ── */
+    .rec-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+    .btn {
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem;
+      border: none; border-radius: 10px; padding: 10px 20px; cursor: pointer;
+      transition: all 0.15s; letter-spacing: 0.02em;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #5b21b6);
+      color: white; box-shadow: 0 4px 16px rgba(124,58,237,0.3);
+    }
+    .btn-primary:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,58,237,0.45); }
+    .btn-danger { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+    .btn-danger:not(:disabled):hover { background: rgba(239,68,68,0.25); }
+    .btn-submit {
+      width: 100%; padding: 14px; font-size: 1rem;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      color: white; border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(6,182,212,0.25);
+    }
+    .btn-submit:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(6,182,212,0.4); }
+    .btn-submit:disabled { opacity: 0.4; }
+
+    /* Pulse ring while recording */
+    .rec-indicator {
+      width: 14px; height: 14px; border-radius: 50%; background: #ef4444;
+      display: none; flex-shrink: 0;
+      box-shadow: 0 0 0 0 rgba(239,68,68,0.4);
+      animation: pulse-ring 1.2s ease-out infinite;
+    }
+    .rec-indicator.active { display: block; }
+    @keyframes pulse-ring {
+      0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+      70%  { box-shadow: 0 0 0 10px rgba(239,68,68,0); }
+      100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+    }
+
+    .rec-status {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted);
+    }
+    .rec-status.live { color: #f87171; }
+    .rec-status.ready { color: var(--success); }
+
+    .waveform-wrap {
+      margin-top: 16px; display: none;
+      background: rgba(124,58,237,0.05); border-radius: 10px;
+      border: 1px solid rgba(124,58,237,0.15); padding: 12px; overflow: hidden;
+    }
+    canvas#waveCanvas { width: 100%; height: 56px; display: block; }
+
+    audio#audioPlayback {
+      width: 100%; margin-top: 14px; border-radius: 10px; display: none;
+      accent-color: var(--accent);
+    }
+
+    /* ── Section 2: Text ── */
+    .text-field {
+      width: 100%; background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); font-family: 'Syne', sans-serif; font-size: 0.95rem;
+      padding: 12px 14px; resize: none; outline: none; transition: border-color 0.2s;
+    }
+    .text-field:focus { border-color: var(--accent); }
+    .char-count { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
+
+    /* ── Section 3 & 4: Toggle pills ── */
+    .pill-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .pill-label {
+      position: relative;
+    }
+    .pill-label input { position: absolute; opacity: 0; pointer-events: none; }
+    .pill-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 18px; border-radius: 100px; cursor: pointer;
+      border: 1.5px solid var(--border); font-family: 'Syne', sans-serif;
+      font-size: 0.85rem; font-weight: 600; color: var(--muted);
+      background: transparent; transition: all 0.15s; user-select: none;
+    }
+    .pill-btn:hover { border-color: var(--accent); color: var(--text); }
+    .pill-label input:checked + .pill-btn {
+      background: rgba(124,58,237,0.15);
+      border-color: var(--accent); color: var(--text);
+    }
+    /* Language specific colors */
+    .pill-label.bengali input:checked + .pill-btn { background: rgba(245,158,11,0.12); border-color: var(--accent3); color: var(--accent3); }
+    .pill-label.english input:checked + .pill-btn { background: rgba(6,182,212,0.12); border-color: var(--accent2); color: var(--accent2); }
+    .pill-label.mixed  input:checked + .pill-btn { background: rgba(124,58,237,0.15); border-color: #a78bfa; color: #a78bfa; }
+    /* Noise specific */
+    .pill-label.noisy input:checked + .pill-btn { background: rgba(239,68,68,0.1); border-color: #f87171; color: #f87171; }
+    .pill-label.quiet input:checked + .pill-btn { background: rgba(16,185,129,0.1); border-color: var(--success); color: var(--success); }
+
+    /* ── Feedback ── */
+    .feedback {
+      margin-top: 16px; padding: 14px 18px; border-radius: 12px;
+      font-size: 0.88rem; font-weight: 600; display: none;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .feedback.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: var(--success); }
+    .feedback.error   { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--error); }
+
+    /* ── Footer divider ── */
+    .submit-wrap { margin-top: 8px; }
+
+    /* Shimmer on submit */
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    .btn-submit.loading {
+      background: linear-gradient(90deg, var(--accent) 25%, #a78bfa 50%, var(--accent) 75%);
+      background-size: 200% auto;
+      animation: shimmer 1.2s linear infinite;
+    }
+
+    /* Counter on top right */
+    .session-badge {
+      position: fixed; top: 20px; right: 20px; z-index: 10;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 100px; padding: 7px 16px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .session-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); }
+
+    @media (max-width: 500px) {
+      .brand-title { font-size: 1.5rem; }
+      .session-badge { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="noise"></div>
+
+<div class="session-badge">
+  <div class="dot"></div>
+  <span id="sessionCount">0</span> this session
+</div>
+
+<div class="container">
+  <header>
+    <div class="brand">
+      <div class="brand-title">VoiceForge</div>
+      <div class="brand-sub">Dataset Studio · Bangla / English</div>
+    </div>
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-pill">Total <span id="statTotal">—</span></div>
+      <div class="stat-pill">Bengali <span id="statBengali">—</span></div>
+      <div class="stat-pill">English <span id="statEnglish">—</span></div>
+      <div class="stat-pill">Mixed <span id="statMixed">—</span></div>
+    </div>
+  </header>
+
+  <div class="steps">
+
+    <!-- ① Recording -->
+    <div class="card" id="card1">
+      <div class="card-header">
+        <div class="step-num" id="sn1">01</div>
+        <div class="card-title">Voice Recording</div>
+      </div>
+
+      <div class="rec-controls">
+        <button class="btn btn-primary" id="startBtn" onclick="startRecording()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
+          Record
+        </button>
+        <button class="btn btn-danger" id="stopBtn" onclick="stopRecording()" disabled>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+          Stop
+        </button>
+        <div class="rec-indicator" id="recDot"></div>
+        <div class="rec-status" id="recStatus">Ready to record</div>
+      </div>
+
+      <div class="waveform-wrap" id="waveWrap">
+        <canvas id="waveCanvas"></canvas>
+      </div>
+      <audio id="audioPlayback" controls></audio>
+    </div>
+
+    <!-- ② Text -->
+    <div class="card" id="card2">
+      <div class="card-header">
+        <div class="step-num" id="sn2">02</div>
+        <div class="card-title">Transcript — What You Said</div>
+      </div>
+      <textarea class="text-field" id="textInput" rows="3" maxlength="1000"
+        placeholder="Type exactly what you said in the recording…"
+        oninput="updateChar()"></textarea>
+      <div class="char-count"><span id="charNum">0</span> / 1000</div>
+    </div>
+
+    <!-- ③ Language Label -->
+    <div class="card" id="card3">
+      <div class="card-header">
+        <div class="step-num" id="sn3">03</div>
+        <div class="card-title">Language Label</div>
+      </div>
+      <div class="pill-group">
+        <label class="pill-label bengali">
+          <input type="radio" name="language" value="bengali" id="langBengali">
+          <span class="pill-btn">🇧🇩 Bengali</span>
+        </label>
+        <label class="pill-label english">
+          <input type="radio" name="language" value="english" id="langEnglish">
+          <span class="pill-btn">🇬🇧 English</span>
+        </label>
+        <label class="pill-label mixed">
+          <input type="radio" name="language" value="mixed" id="langMixed">
+          <span class="pill-btn">🔀 Mixed</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- ④ Noise Level -->
+    <div class="card" id="card4">
+      <div class="card-header">
+        <div class="step-num" id="sn4">04</div>
+        <div class="card-title">Recording Environment</div>
+      </div>
+      <div class="pill-group">
+        <label class="pill-label noisy">
+          <input type="radio" name="environment" value="noisy" id="envNoisy">
+          <span class="pill-btn">🔊 Noisy</span>
+        </label>
+        <label class="pill-label quiet">
+          <input type="radio" name="environment" value="quiet" id="envQuiet">
+          <span class="pill-btn">🔇 Quiet</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="submit-wrap">
+      <button class="btn btn-submit" id="submitBtn" onclick="submitForm()" disabled>
+        Submit Entry
+      </button>
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let mediaRecorder, audioChunks = [], audioBase64 = null, sessionCount = 0;
+let animFrameId, analyser, dataArray;
+
+// ── Waveform Visualizer ──
+function startWaveform(stream) {
+  const ctx = new AudioContext();
+  const src = ctx.createMediaStreamSource(stream);
+  analyser = ctx.createAnalyser();
+  analyser.fftSize = 256;
+  src.connect(analyser);
+  dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+  const canvas = document.getElementById('waveCanvas');
+  const c = canvas.getContext('2d');
+  document.getElementById('waveWrap').style.display = 'block';
+
+  function draw() {
+    animFrameId = requestAnimationFrame(draw);
+    analyser.getByteTimeDomainData(dataArray);
+    canvas.width = canvas.offsetWidth;
+    canvas.height = 56;
+    c.clearRect(0, 0, canvas.width, canvas.height);
+
+    const grad = c.createLinearGradient(0, 0, canvas.width, 0);
+    grad.addColorStop(0, '#7c3aed'); grad.addColorStop(1, '#06b6d4');
+    c.strokeStyle = grad; c.lineWidth = 2; c.beginPath();
+
+    const sliceW = canvas.width / dataArray.length;
+    let x = 0;
+    for (let i = 0; i < dataArray.length; i++) {
+      const v = dataArray[i] / 128.0;
+      const y = (v * canvas.height) / 2;
+      i === 0 ? c.moveTo(x, y) : c.lineTo(x, y);
+      x += sliceW;
+    }
+    c.stroke();
+  }
+  draw();
+}
+
+function stopWaveform() { if (animFrameId) cancelAnimationFrame(animFrameId); }
+
+// ── Recording ──
+async function startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = []; audioBase64 = null;
+
+    document.getElementById('startBtn').disabled = true;
+    document.getElementById('stopBtn').disabled = false;
+    document.getElementById('recDot').classList.add('active');
+    setRecStatus('🔴 Recording…', 'live');
+    document.getElementById('audioPlayback').style.display = 'none';
+    document.getElementById('card1').classList.add('active');
+    hideFeedback();
+
+    startWaveform(stream);
+
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+
+    mediaRecorder.onstop = () => {
+      stopWaveform();
+      stream.getTracks().forEach(t => t.stop());
+
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onloadend = () => {
+        audioBase64 = reader.result;
+        const ap = document.getElementById('audioPlayback');
+        ap.src = URL.createObjectURL(blob);
+        ap.style.display = 'block';
+        setRecStatus('✔ Recording captured', 'ready');
+        document.getElementById('recDot').classList.remove('active');
+        document.getElementById('card1').classList.remove('active');
+        document.getElementById('sn1').classList.add('done');
+        checkReady();
+      };
+    };
+
+    mediaRecorder.start();
+  } catch {
+    setRecStatus('❌ Mic access denied', '');
+  }
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop();
+    document.getElementById('stopBtn').disabled = true;
+    document.getElementById('startBtn').disabled = false;
+  }
+}
+
+// ── Helpers ──
+function setRecStatus(msg, cls) {
+  const el = document.getElementById('recStatus');
+  el.textContent = msg; el.className = 'rec-status ' + cls;
+}
+
+function updateChar() {
+  const n = document.getElementById('textInput').value.length;
+  document.getElementById('charNum').textContent = n;
+  checkReady();
+}
+
+function checkReady() {
+  const hasAudio = !!audioBase64;
+  const hasText = document.getElementById('textInput').value.trim().length > 0;
+  const hasLang = !!document.querySelector('input[name="language"]:checked');
+  const hasEnv  = !!document.querySelector('input[name="environment"]:checked');
+  document.getElementById('submitBtn').disabled = !(hasAudio && hasText && hasLang && hasEnv);
+}
+
+// Auto check ready on pill select
+document.querySelectorAll('input[name="language"], input[name="environment"]')
+  .forEach(el => el.addEventListener('change', checkReady));
+
+function hideFeedback() {
+  const el = document.getElementById('feedback');
+  el.style.display = 'none'; el.className = 'feedback';
+}
+
+function showFeedback(msg, ok) {
+  const el = document.getElementById('feedback');
+  el.textContent = msg;
+  el.className = 'feedback ' + (ok ? 'success' : 'error');
+  el.style.display = 'block';
+}
+
+// ── Submit ──
+async function submitForm() {
+  const text = document.getElementById('textInput').value.trim();
+  const language = document.querySelector('input[name="language"]:checked')?.value;
+  const environment = document.querySelector('input[name="environment"]:checked')?.value;
+
+  if (!audioBase64) return showFeedback('⚠ Please record audio first.', false);
+  if (!text)        return showFeedback('⚠ Please enter the transcript.', false);
+  if (!language)    return showFeedback('⚠ Please select a language label.', false);
+  if (!environment) return showFeedback('⚠ Please select an environment.', false);
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Saving…'; btn.classList.add('loading');
+  hideFeedback();
+
+  const fd = new FormData();
+  fd.append('audio_data', audioBase64);
+  fd.append('text', text);
+  fd.append('language', language);
+  fd.append('environment', environment);
+
+  try {
+    const res  = await fetch('/upload/', { method: 'POST', body: fd });
+    const data = await res.json();
+
+    if (res.ok) {
+      showFeedback(`✅ Saved! (${data.filename})`, true);
+      sessionCount++;
+      document.getElementById('sessionCount').textContent = sessionCount;
+
+      // Reset
+      document.getElementById('textInput').value = '';
+      document.getElementById('charNum').textContent = '0';
+      document.getElementById('audioPlayback').style.display = 'none';
+      document.getElementById('waveWrap').style.display = 'none';
+      document.querySelectorAll('input[name="language"], input[name="environment"]')
+        .forEach(el => el.checked = false);
+      document.querySelectorAll('.step-num').forEach(el => el.classList.remove('done'));
+      audioBase64 = null;
+      setRecStatus('Ready to record', '');
+      loadStats();
+    } else {
+      showFeedback('❌ ' + data.detail, false);
+    }
+  } catch {
+    showFeedback('❌ Network error. Try again.', false);
+  }
+
+  btn.classList.remove('loading');
+  btn.textContent = 'Submit Entry';
+  btn.disabled = false;
+  checkReady();
+}
+
+// ── Load Stats ──
+async function loadStats() {
+  try {
+    const data = await (await fetch('/stats')).json();
+    document.getElementById('statTotal').textContent   = data.total;
+    document.getElementById('statBengali').textContent = data.bengali;
+    document.getElementById('statEnglish').textContent = data.english;
+    document.getElementById('statMixed').textContent   = data.mixed;
+  } catch {}
+}
+
+loadStats();
+</script>
+</body>
+</html>
