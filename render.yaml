@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 services:
   - type: web
     name: voice-dataset
@@ -21,4 +22,29 @@ voice_dataset_app/
 ├── requirements.txt
 ├── render.yaml        ← new file
 └── templates/
+=======
+services:
+  - type: web
+    name: voice-dataset
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    disk:
+      name: dataset-storage
+      mountPath: /app/dataset
+      sizeGB: 1
+```
+
+**5.** Press **Ctrl + S** to save
+
+---
+
+Your folder should look like this in VS Code:
+```
+voice_dataset_app/
+├── main.py
+├── requirements.txt
+├── render.yaml        ← new file
+└── templates/
+>>>>>>> fe3d1ed79309d76189aae5295e942332df9fea76
     └── index.html
