@@ -124,3 +124,11 @@ async def upload(
 
     logger.info(f"Saved {filename} | lang={language} | env={environment} | text={text[:40]}")
     return JSONResponse({"message": "Saved successfully!", "filename": filename})
+@app.get("/debug")
+async def debug():
+    return {
+        "csv_file": CSV_FILE,
+        "csv_exists": os.path.exists(CSV_FILE),
+        "audio_dir": AUDIO_DIR,
+        "dataset_dir_contents": os.listdir(DATASET_DIR) if os.path.exists(DATASET_DIR) else "NOT FOUND"
+    }
