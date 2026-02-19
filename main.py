@@ -120,6 +120,7 @@ async def download_csv():
             e.get("environment", ""),
             e.get("timestamp", ""),
         ])
+        
 
     output.seek(0)
     return StreamingResponse(
