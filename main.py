@@ -120,13 +120,24 @@ async def download_csv():
             e.get("environment", ""),
             e.get("timestamp", ""),
         ])
-        
 
     output.seek(0)
     return StreamingResponse(
         iter([output.getvalue()]),
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=metadata.csv"}
+    )
+@app.get("/download-audio/{filename}")
+async def download_audio(filename: str):
+    entry = await collection.find_one({"filename": filename})
+    if not entry:
+        raise HTTPException(status_code=404, detail="Audio not found.")
+    
+    audio_bytes = base64.b64decode(entry["audio_b64"])
+    return StreamingResponse(
+        io.BytesIO(audio_bytes),
+        media_type="audio/webm",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
 
