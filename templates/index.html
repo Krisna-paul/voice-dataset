@@ -58,27 +58,22 @@
     }
     .brand-sub { font-size: 0.78rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; }
 
-    /* Stats pill */
-    .stats-bar {
-      display: flex; gap: 8px; flex-wrap: wrap;
-    }
+    .stats-bar { display: flex; gap: 8px; flex-wrap: wrap; }
     .stat-pill {
       font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
       padding: 5px 12px; border-radius: 100px;
-      border: 1px solid var(--border);
-      background: var(--surface);
+      border: 1px solid var(--border); background: var(--surface);
       color: var(--muted); display: flex; align-items: center; gap: 6px;
     }
     .stat-pill span { color: var(--text); font-weight: 500; }
 
-    /* ── Step cards ── */
+    /* ── Cards ── */
     .steps { display: flex; flex-direction: column; gap: 16px; }
 
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
+      border-radius: 16px; padding: 24px;
       transition: border-color 0.2s;
       position: relative; overflow: hidden;
     }
@@ -102,9 +97,7 @@
     .step-num.done { background: linear-gradient(135deg, var(--success), #059669); }
     .card-title { font-size: 0.9rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
 
-    /* ── Section 1: Recording ── */
-    .rec-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-
+    /* ── Buttons ── */
     .btn {
       font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem;
       border: none; border-radius: 10px; padding: 10px 20px; cursor: pointer;
@@ -128,11 +121,11 @@
     .btn-submit:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(6,182,212,0.4); }
     .btn-submit:disabled { opacity: 0.4; }
 
-    /* Pulse ring while recording */
+    /* ── Recording ── */
+    .rec-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .rec-indicator {
       width: 14px; height: 14px; border-radius: 50%; background: #ef4444;
       display: none; flex-shrink: 0;
-      box-shadow: 0 0 0 0 rgba(239,68,68,0.4);
       animation: pulse-ring 1.2s ease-out infinite;
     }
     .rec-indicator.active { display: block; }
@@ -141,26 +134,21 @@
       70%  { box-shadow: 0 0 0 10px rgba(239,68,68,0); }
       100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
     }
-
-    .rec-status {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted);
-    }
+    .rec-status { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted); }
     .rec-status.live { color: #f87171; }
     .rec-status.ready { color: var(--success); }
-
     .waveform-wrap {
       margin-top: 16px; display: none;
       background: rgba(124,58,237,0.05); border-radius: 10px;
       border: 1px solid rgba(124,58,237,0.15); padding: 12px; overflow: hidden;
     }
     canvas#waveCanvas { width: 100%; height: 56px; display: block; }
-
     audio#audioPlayback {
       width: 100%; margin-top: 14px; border-radius: 10px; display: none;
       accent-color: var(--accent);
     }
 
-    /* ── Section 2: Text ── */
+    /* ── Text field ── */
     .text-field {
       width: 100%; background: rgba(255,255,255,0.04);
       border: 1px solid var(--border); border-radius: 10px;
@@ -170,12 +158,21 @@
     .text-field:focus { border-color: var(--accent); }
     .char-count { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
 
-    /* ── Section 3 & 4: Toggle pills ── */
-    .pill-group { display: flex; gap: 10px; flex-wrap: wrap; }
-
-    .pill-label {
-      position: relative;
+    /* ── Input field (speaker id) ── */
+    .input-field {
+      width: 100%; background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;
+      padding: 11px 14px; outline: none; transition: border-color 0.2s;
+      text-transform: uppercase; letter-spacing: 0.05em;
     }
+    .input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,58,237,0.12); }
+    .input-field::placeholder { color: var(--muted); text-transform: none; letter-spacing: 0; }
+    .input-hint { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-top: 7px; }
+
+    /* ── Pill groups ── */
+    .pill-group { display: flex; gap: 10px; flex-wrap: wrap; }
+    .pill-label { position: relative; }
     .pill-label input { position: absolute; opacity: 0; pointer-events: none; }
     .pill-btn {
       display: inline-flex; align-items: center; gap: 8px;
@@ -185,17 +182,42 @@
       background: transparent; transition: all 0.15s; user-select: none;
     }
     .pill-btn:hover { border-color: var(--accent); color: var(--text); }
-    .pill-label input:checked + .pill-btn {
-      background: rgba(124,58,237,0.15);
-      border-color: var(--accent); color: var(--text);
-    }
-    /* Language specific colors */
+    .pill-label input:checked + .pill-btn { background: rgba(124,58,237,0.15); border-color: var(--accent); color: var(--text); }
+
+    /* Language */
     .pill-label.bengali input:checked + .pill-btn { background: rgba(245,158,11,0.12); border-color: var(--accent3); color: var(--accent3); }
     .pill-label.english input:checked + .pill-btn { background: rgba(6,182,212,0.12); border-color: var(--accent2); color: var(--accent2); }
-    .pill-label.mixed  input:checked + .pill-btn { background: rgba(124,58,237,0.15); border-color: #a78bfa; color: #a78bfa; }
-    /* Noise specific */
+    .pill-label.mixed   input:checked + .pill-btn { background: rgba(124,58,237,0.15); border-color: #a78bfa; color: #a78bfa; }
+    /* Noise */
     .pill-label.noisy input:checked + .pill-btn { background: rgba(239,68,68,0.1); border-color: #f87171; color: #f87171; }
     .pill-label.quiet input:checked + .pill-btn { background: rgba(16,185,129,0.1); border-color: var(--success); color: var(--success); }
+    /* Intent */
+    .pill-label.intent input:checked + .pill-btn { background: rgba(6,182,212,0.12); border-color: var(--accent2); color: var(--accent2); }
+    /* Colors */
+    .pill-label.color-opt input:checked + .pill-btn { background: rgba(245,158,11,0.12); border-color: var(--accent3); color: var(--accent3); }
+    /* Direction */
+    .pill-label.dir-opt input:checked + .pill-btn { background: rgba(16,185,129,0.1); border-color: var(--success); color: var(--success); }
+
+    /* ── Slot section sub-label ── */
+    .slot-label {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--muted); margin-bottom: 10px; margin-top: 18px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .slot-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .slot-label:first-child { margin-top: 0; }
+
+    /* Optional badge */
+    .opt-badge {
+      font-size: 0.62rem; padding: 2px 7px; border-radius: 100px;
+      background: rgba(100,116,139,0.15); color: var(--muted);
+      border: 1px solid rgba(100,116,139,0.2);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Slot pills smaller */
+    .pill-group.small .pill-btn { padding: 7px 13px; font-size: 0.78rem; }
 
     /* ── Feedback ── */
     .feedback {
@@ -206,10 +228,8 @@
     .feedback.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: var(--success); }
     .feedback.error   { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--error); }
 
-    /* ── Footer divider ── */
     .submit-wrap { margin-top: 8px; }
 
-    /* Shimmer on submit */
     @keyframes shimmer {
       0% { background-position: -200% center; }
       100% { background-position: 200% center; }
@@ -220,7 +240,6 @@
       animation: shimmer 1.2s linear infinite;
     }
 
-    /* Counter on top right */
     .session-badge {
       position: fixed; top: 20px; right: 20px; z-index: 10;
       background: var(--surface); border: 1px solid var(--border);
@@ -229,6 +248,11 @@
       display: flex; align-items: center; gap: 8px;
     }
     .session-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); }
+
+    /* color dot preview in pill */
+    .cdot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
 
     @media (max-width: 500px) {
       .brand-title { font-size: 1.5rem; }
@@ -260,13 +284,12 @@
 
   <div class="steps">
 
-    <!-- ① Recording -->
+    <!-- ① Voice Recording -->
     <div class="card" id="card1">
       <div class="card-header">
         <div class="step-num" id="sn1">01</div>
         <div class="card-title">Voice Recording</div>
       </div>
-
       <div class="rec-controls">
         <button class="btn btn-primary" id="startBtn" onclick="startRecording()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
@@ -279,14 +302,13 @@
         <div class="rec-indicator" id="recDot"></div>
         <div class="rec-status" id="recStatus">Ready to record</div>
       </div>
-
       <div class="waveform-wrap" id="waveWrap">
         <canvas id="waveCanvas"></canvas>
       </div>
       <audio id="audioPlayback" controls></audio>
     </div>
 
-    <!-- ② Text -->
+    <!-- ② Transcript -->
     <div class="card" id="card2">
       <div class="card-header">
         <div class="step-num" id="sn2">02</div>
@@ -306,21 +328,21 @@
       </div>
       <div class="pill-group">
         <label class="pill-label bengali">
-          <input type="radio" name="language" value="bengali" id="langBengali">
+          <input type="radio" name="language" value="bengali">
           <span class="pill-btn">🇧🇩 Bengali</span>
         </label>
         <label class="pill-label english">
-          <input type="radio" name="language" value="english" id="langEnglish">
+          <input type="radio" name="language" value="english">
           <span class="pill-btn">🇬🇧 English</span>
         </label>
         <label class="pill-label mixed">
-          <input type="radio" name="language" value="mixed" id="langMixed">
+          <input type="radio" name="language" value="mixed">
           <span class="pill-btn">🔀 Mixed</span>
         </label>
       </div>
     </div>
 
-    <!-- ④ Noise Level -->
+    <!-- ④ Environment -->
     <div class="card" id="card4">
       <div class="card-header">
         <div class="step-num" id="sn4">04</div>
@@ -328,13 +350,122 @@
       </div>
       <div class="pill-group">
         <label class="pill-label noisy">
-          <input type="radio" name="environment" value="noisy" id="envNoisy">
+          <input type="radio" name="environment" value="noisy">
           <span class="pill-btn">🔊 Noisy</span>
         </label>
         <label class="pill-label quiet">
-          <input type="radio" name="environment" value="quiet" id="envQuiet">
+          <input type="radio" name="environment" value="quiet">
           <span class="pill-btn">🔇 Quiet</span>
         </label>
+      </div>
+    </div>
+
+    <!-- ⑤ Speaker ID -->
+    <div class="card" id="card5">
+      <div class="card-header">
+        <div class="step-num" id="sn5">05</div>
+        <div class="card-title">Speaker ID</div>
+      </div>
+      <input
+        class="input-field" id="speakerInput"
+        type="text" maxlength="20"
+        placeholder="e.g. SPK_01"
+        oninput="checkReady()"
+      />
+      <div class="input-hint">Use a consistent ID each session — e.g. SPK_01, SPK_02 … SPK_20</div>
+    </div>
+
+    <!-- ⑥ Intent -->
+    <div class="card" id="card6">
+      <div class="card-header">
+        <div class="step-num" id="sn6">06</div>
+        <div class="card-title">Command Intent</div>
+      </div>
+      <div class="pill-group" style="row-gap:8px">
+        <label class="pill-label intent">
+          <input type="radio" name="intent" value="pick_and_place">
+          <span class="pill-btn">🤏 Pick &amp; Place</span>
+        </label>
+        <label class="pill-label intent">
+          <input type="radio" name="intent" value="pick_object">
+          <span class="pill-btn">☝️ Pick Object</span>
+        </label>
+        <label class="pill-label intent">
+          <input type="radio" name="intent" value="place_object">
+          <span class="pill-btn">📥 Place Object</span>
+        </label>
+        <label class="pill-label intent">
+          <input type="radio" name="intent" value="move_robot">
+          <span class="pill-btn">🚗 Move Robot</span>
+        </label>
+        <label class="pill-label intent">
+          <input type="radio" name="intent" value="query_weather">
+          <span class="pill-btn">🌤 Weather</span>
+        </label>
+        <label class="pill-label intent">
+          <input type="radio" name="intent" value="query_cricket">
+          <span class="pill-btn">🏏 Cricket</span>
+        </label>
+        <label class="pill-label intent">
+          <input type="radio" name="intent" value="arm_home">
+          <span class="pill-btn">🏠 Arm Home</span>
+        </label>
+        <label class="pill-label intent">
+          <input type="radio" name="intent" value="stop">
+          <span class="pill-btn">🛑 Stop</span>
+        </label>
+        <label class="pill-label intent">
+          <input type="radio" name="intent" value="greet">
+          <span class="pill-btn">👋 Greet</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- ⑦ Slots -->
+    <div class="card" id="card7">
+      <div class="card-header">
+        <div class="step-num" id="sn7">07</div>
+        <div class="card-title">Slot Values <span class="opt-badge">fill what applies</span></div>
+      </div>
+
+      <!-- Object Color -->
+      <div class="slot-label">Object Color</div>
+      <div class="pill-group small" id="objColorGroup">
+        <label class="pill-label color-opt"><input type="radio" name="object_color" value="red"><span class="pill-btn"><span class="cdot" style="background:#ef4444"></span>Red</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="object_color" value="green"><span class="pill-btn"><span class="cdot" style="background:#22c55e"></span>Green</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="object_color" value="blue"><span class="pill-btn"><span class="cdot" style="background:#3b82f6"></span>Blue</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="object_color" value="yellow"><span class="pill-btn"><span class="cdot" style="background:#eab308"></span>Yellow</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="object_color" value="orange"><span class="pill-btn"><span class="cdot" style="background:#f97316"></span>Orange</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="object_color" value="white"><span class="pill-btn"><span class="cdot" style="background:#e2e8f0;border:1px solid #334155"></span>White</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="object_color" value="black"><span class="pill-btn"><span class="cdot" style="background:#1e293b;border:1px solid #475569"></span>Black</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="object_color" value="purple"><span class="pill-btn"><span class="cdot" style="background:#a855f7"></span>Purple</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="object_color" value="pink"><span class="pill-btn"><span class="cdot" style="background:#ec4899"></span>Pink</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="object_color" value=""><span class="pill-btn">✕ None</span></label>
+      </div>
+
+      <!-- Target Color -->
+      <div class="slot-label">Target / Bowl Color</div>
+      <div class="pill-group small" id="tgtColorGroup">
+        <label class="pill-label color-opt"><input type="radio" name="target_color" value="red"><span class="pill-btn"><span class="cdot" style="background:#ef4444"></span>Red</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="target_color" value="green"><span class="pill-btn"><span class="cdot" style="background:#22c55e"></span>Green</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="target_color" value="blue"><span class="pill-btn"><span class="cdot" style="background:#3b82f6"></span>Blue</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="target_color" value="yellow"><span class="pill-btn"><span class="cdot" style="background:#eab308"></span>Yellow</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="target_color" value="orange"><span class="pill-btn"><span class="cdot" style="background:#f97316"></span>Orange</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="target_color" value="white"><span class="pill-btn"><span class="cdot" style="background:#e2e8f0;border:1px solid #334155"></span>White</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="target_color" value="black"><span class="pill-btn"><span class="cdot" style="background:#1e293b;border:1px solid #475569"></span>Black</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="target_color" value="purple"><span class="pill-btn"><span class="cdot" style="background:#a855f7"></span>Purple</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="target_color" value="pink"><span class="pill-btn"><span class="cdot" style="background:#ec4899"></span>Pink</span></label>
+        <label class="pill-label color-opt"><input type="radio" name="target_color" value=""><span class="pill-btn">✕ None</span></label>
+      </div>
+
+      <!-- Direction -->
+      <div class="slot-label">Direction <span class="opt-badge">move_robot only</span></div>
+      <div class="pill-group small">
+        <label class="pill-label dir-opt"><input type="radio" name="direction" value="forward"><span class="pill-btn">⬆ Forward</span></label>
+        <label class="pill-label dir-opt"><input type="radio" name="direction" value="backward"><span class="pill-btn">⬇ Backward</span></label>
+        <label class="pill-label dir-opt"><input type="radio" name="direction" value="left"><span class="pill-btn">⬅ Left</span></label>
+        <label class="pill-label dir-opt"><input type="radio" name="direction" value="right"><span class="pill-btn">➡ Right</span></label>
+        <label class="pill-label dir-opt"><input type="radio" name="direction" value=""><span class="pill-btn">✕ None</span></label>
       </div>
     </div>
 
@@ -353,7 +484,7 @@
 let mediaRecorder, audioChunks = [], audioBase64 = null, sessionCount = 0;
 let animFrameId, analyser, dataArray;
 
-// ── Waveform Visualizer ──
+// ── Waveform ──────────────────────────────────────────────────
 function startWaveform(stream) {
   const ctx = new AudioContext();
   const src = ctx.createMediaStreamSource(stream);
@@ -361,22 +492,17 @@ function startWaveform(stream) {
   analyser.fftSize = 256;
   src.connect(analyser);
   dataArray = new Uint8Array(analyser.frequencyBinCount);
-
   const canvas = document.getElementById('waveCanvas');
   const c = canvas.getContext('2d');
   document.getElementById('waveWrap').style.display = 'block';
-
   function draw() {
     animFrameId = requestAnimationFrame(draw);
     analyser.getByteTimeDomainData(dataArray);
-    canvas.width = canvas.offsetWidth;
-    canvas.height = 56;
+    canvas.width = canvas.offsetWidth; canvas.height = 56;
     c.clearRect(0, 0, canvas.width, canvas.height);
-
     const grad = c.createLinearGradient(0, 0, canvas.width, 0);
     grad.addColorStop(0, '#7c3aed'); grad.addColorStop(1, '#06b6d4');
     c.strokeStyle = grad; c.lineWidth = 2; c.beginPath();
-
     const sliceW = canvas.width / dataArray.length;
     let x = 0;
     for (let i = 0; i < dataArray.length; i++) {
@@ -389,16 +515,14 @@ function startWaveform(stream) {
   }
   draw();
 }
-
 function stopWaveform() { if (animFrameId) cancelAnimationFrame(animFrameId); }
 
-// ── Recording ──
+// ── Recording ─────────────────────────────────────────────────
 async function startRecording() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     mediaRecorder = new MediaRecorder(stream);
     audioChunks = []; audioBase64 = null;
-
     document.getElementById('startBtn').disabled = true;
     document.getElementById('stopBtn').disabled = false;
     document.getElementById('recDot').classList.add('active');
@@ -406,15 +530,11 @@ async function startRecording() {
     document.getElementById('audioPlayback').style.display = 'none';
     document.getElementById('card1').classList.add('active');
     hideFeedback();
-
     startWaveform(stream);
-
     mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-
     mediaRecorder.onstop = () => {
       stopWaveform();
       stream.getTracks().forEach(t => t.stop());
-
       const blob = new Blob(audioChunks, { type: 'audio/webm' });
       const reader = new FileReader();
       reader.readAsDataURL(blob);
@@ -430,7 +550,6 @@ async function startRecording() {
         checkReady();
       };
     };
-
     mediaRecorder.start();
   } catch {
     setRecStatus('❌ Mic access denied', '');
@@ -445,12 +564,12 @@ function stopRecording() {
   }
 }
 
-// ── Helpers ──
 function setRecStatus(msg, cls) {
   const el = document.getElementById('recStatus');
   el.textContent = msg; el.className = 'rec-status ' + cls;
 }
 
+// ── Helpers ───────────────────────────────────────────────────
 function updateChar() {
   const n = document.getElementById('textInput').value.length;
   document.getElementById('charNum').textContent = n;
@@ -458,22 +577,24 @@ function updateChar() {
 }
 
 function checkReady() {
-  const hasAudio = !!audioBase64;
-  const hasText = document.getElementById('textInput').value.trim().length > 0;
-  const hasLang = !!document.querySelector('input[name="language"]:checked');
-  const hasEnv  = !!document.querySelector('input[name="environment"]:checked');
-  document.getElementById('submitBtn').disabled = !(hasAudio && hasText && hasLang && hasEnv);
+  const hasAudio   = !!audioBase64;
+  const hasText    = document.getElementById('textInput').value.trim().length > 0;
+  const hasLang    = !!document.querySelector('input[name="language"]:checked');
+  const hasEnv     = !!document.querySelector('input[name="environment"]:checked');
+  const hasSpk     = document.getElementById('speakerInput').value.trim().length > 0;
+  const hasIntent  = !!document.querySelector('input[name="intent"]:checked');
+  document.getElementById('submitBtn').disabled =
+    !(hasAudio && hasText && hasLang && hasEnv && hasSpk && hasIntent);
 }
 
-// Auto check ready on pill select
-document.querySelectorAll('input[name="language"], input[name="environment"]')
+// Listen on all radio changes
+document.querySelectorAll('input[type="radio"]')
   .forEach(el => el.addEventListener('change', checkReady));
 
 function hideFeedback() {
   const el = document.getElementById('feedback');
   el.style.display = 'none'; el.className = 'feedback';
 }
-
 function showFeedback(msg, ok) {
   const el = document.getElementById('feedback');
   el.textContent = msg;
@@ -481,43 +602,57 @@ function showFeedback(msg, ok) {
   el.style.display = 'block';
 }
 
-// ── Submit ──
+// ── Submit ────────────────────────────────────────────────────
 async function submitForm() {
-  const text = document.getElementById('textInput').value.trim();
-  const language = document.querySelector('input[name="language"]:checked')?.value;
+  const text        = document.getElementById('textInput').value.trim();
+  const language    = document.querySelector('input[name="language"]:checked')?.value;
   const environment = document.querySelector('input[name="environment"]:checked')?.value;
+  const speaker_id  = document.getElementById('speakerInput').value.trim();
+  const intent      = document.querySelector('input[name="intent"]:checked')?.value || '';
+  const object_color= document.querySelector('input[name="object_color"]:checked')?.value || '';
+  const target_color= document.querySelector('input[name="target_color"]:checked')?.value || '';
+  const direction   = document.querySelector('input[name="direction"]:checked')?.value || '';
 
-  if (!audioBase64) return showFeedback('⚠ Please record audio first.', false);
-  if (!text)        return showFeedback('⚠ Please enter the transcript.', false);
-  if (!language)    return showFeedback('⚠ Please select a language label.', false);
-  if (!environment) return showFeedback('⚠ Please select an environment.', false);
+  if (!audioBase64)  return showFeedback('⚠ Please record audio first.', false);
+  if (!text)         return showFeedback('⚠ Please enter the transcript.', false);
+  if (!language)     return showFeedback('⚠ Please select a language label.', false);
+  if (!environment)  return showFeedback('⚠ Please select an environment.', false);
+  if (!speaker_id)   return showFeedback('⚠ Please enter your Speaker ID.', false);
+  if (!intent)       return showFeedback('⚠ Please select a command intent.', false);
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true; btn.textContent = 'Saving…'; btn.classList.add('loading');
   hideFeedback();
 
   const fd = new FormData();
-  fd.append('audio_data', audioBase64);
-  fd.append('text', text);
-  fd.append('language', language);
-  fd.append('environment', environment);
+  fd.append('audio_data',   audioBase64);
+  fd.append('text',         text);
+  fd.append('language',     language);
+  fd.append('environment',  environment);
+  fd.append('speaker_id',   speaker_id);
+  fd.append('intent',       intent);
+  fd.append('object_color', object_color);
+  fd.append('target_color', target_color);
+  fd.append('direction',    direction);
 
   try {
     const res  = await fetch('/upload/', { method: 'POST', body: fd });
     const data = await res.json();
 
     if (res.ok) {
-      showFeedback(`✅ Saved! (${data.filename})`, true);
+      showFeedback(`✅ Saved! ${speaker_id} · ${intent} (${data.filename.slice(0,8)}…)`, true);
       sessionCount++;
       document.getElementById('sessionCount').textContent = sessionCount;
 
-      // Reset
+      // Reset everything EXCEPT speaker_id (stays for same session)
       document.getElementById('textInput').value = '';
       document.getElementById('charNum').textContent = '0';
       document.getElementById('audioPlayback').style.display = 'none';
       document.getElementById('waveWrap').style.display = 'none';
-      document.querySelectorAll('input[name="language"], input[name="environment"]')
-        .forEach(el => el.checked = false);
+      document.querySelectorAll(
+        'input[name="language"], input[name="environment"], input[name="intent"],' +
+        'input[name="object_color"], input[name="target_color"], input[name="direction"]'
+      ).forEach(el => el.checked = false);
       document.querySelectorAll('.step-num').forEach(el => el.classList.remove('done'));
       audioBase64 = null;
       setRecStatus('Ready to record', '');
@@ -535,7 +670,7 @@ async function submitForm() {
   checkReady();
 }
 
-// ── Load Stats ──
+// ── Stats ─────────────────────────────────────────────────────
 async function loadStats() {
   try {
     const data = await (await fetch('/stats')).json();
