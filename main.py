@@ -132,9 +132,9 @@ async def upload(
         "language":     language.lower(),
         "environment":  environment.lower(),
         "intent":       intent.lower(),
-        "object_color": object_color.lower(),
-        "target_color": target_color.lower(),
-        "direction":    direction.lower(),
+        "object_color": object_color.lower() if object_color else "none",
+        "target_color": target_color.lower() if target_color else "none",
+        "direction":    direction.lower() if direction else "none",
         "timestamp":    timestamp,
         "audio_b64":    encoded,
     }
